@@ -1,0 +1,5 @@
+name "d_codi"
+description "Image Processing for CoDI"
+dependency "imageformats" version="~>5.1.0"
+sourcePath "src/image_proc"
+targetType "executable"
