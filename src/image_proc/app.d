@@ -8,7 +8,13 @@ void main(in string[] args) {
     }
     IFImage im = read_image(args[1]);
 
-    ubyte r = 0; ubyte g = 0; ubyte b = 0;
+    ubyte r = 0;
+    ubyte g = 0;
+    ubyte b = 0;
+
+    auto redPixels = 0;
+    auto greenPixels = 0;
+    auto bluePixels = 0;
 
     foreach (i; 0 .. im.pixels.length) {
         auto rgb = i % 3;
@@ -21,11 +27,33 @@ void main(in string[] args) {
         }
 
         if (r > 25) {
-            im.pixels[i] = 0;
-        } else {
-            im.pixels[i] = 255;
+            redPixels++;
+        }
+
+        if (g > 25) {
+            greenPixels++;
+        }
+
+        if (b > 25) {
+            bluePixels++;
         }
     }
 
-    write_image("out.png", im.w, im.h, im.pixels);
+    auto dominantColor = 0;
+    if (redPixels > greenPixels) {
+        if (bluePixels > redPixels) {
+            dominantColor = 2;
+        }
+    } else {
+        dominantColor = 1;
+        if (bluePixels > greenPixels) {
+            dominantColor = 2;
+        }
+    }
+
+    writeln("Dominant color is ", dominantColor);
+
+    writeln("Size is ", dominantColor == 0 ? redPixels : dominantColor == 1 ? greenPixels
+        : bluePixels);
+    /* write_image("out.png", im.w, im.h, im.pixels); */
 }
