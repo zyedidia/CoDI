@@ -1,6 +1,7 @@
 import std.stdio;
 import imageformats;
 
+// finds the dominant color in an input picture
 void main(in string[] args) {
     if (args.length < 2) {
         writeln("No input file");
