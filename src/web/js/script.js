@@ -35,7 +35,11 @@ function newPill() {
                 return;
             }
 
-            var dir = __dirname + '/../../../pills/' + data.pillname.toLowerCase();
+            var pillsDir = __dirname + '/../../../pills/';
+            if (!fs.existsSync(pillsDir)) {
+                fs.mkdirSync(pillsDir);
+            }
+            var dir = pillsDir + data.pillname.toLowerCase();
 
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
