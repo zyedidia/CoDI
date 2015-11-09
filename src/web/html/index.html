@@ -1,9 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello World!</title>
+        <title>CoDI</title>
+        <script>window.$ = window.jQuery = require('../js/jquery-1.11.3.min.js');</script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+        <script src="../js/vex.combined.min.js"></script>
+        <script>vex.defaultOptions.className = 'vex-theme-os';</script>
+        <link rel="stylesheet" href="../css/vex.css" />
+        <link rel="stylesheet" href="../css/vex-theme-os.css" />
+        <link rel="stylesheet" href="../css/theme.css"/>
+
+        <script src="../js/script.js"></script>
     </head>
-    <body>
-        <META http-equiv="refresh" content="0;URL=http://cademons.org">
+    <body onload="listPills()">
+        <h1 id="mainTitle">CoDI</h1>
+
+        <h4>Select a pill</h4>
+        <ul id="pillList">
+        </ul>
+
+        <button class="btn btn-default" type="button" onclick="newPill()">Create new pill</button>
     </body>
 </html>
