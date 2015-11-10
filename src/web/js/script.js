@@ -64,12 +64,31 @@ function removePill(pill) {
     });
 }
 
+function selectPill(pill) {
+    vex.dialog.open({
+        message: 'Calibrate or Analyze',
+        buttons: [
+            $.extend({}, vex.dialog.buttons.NO, { className: 'vex-dialog-button-primary', text: 'Calibrate', click: function($vexContent, event) {
+                $vexContent.data().vex.value = 'calibrate';
+                vex.close($vexContent.data().vex.id);
+            }}),
+            $.extend({}, vex.dialog.buttons.NO, { text: 'Analyze', click: function($vexContent, event) {
+                $vexContent.data().vex.value = 'analyze';
+                vex.close($vexContent.data().vex.id);
+            }})
+        ],
+        callback: function(value) {
+            console.log('Choice', value);
+        }
+    });
+}
+
 function listPills() {
     var files = fs.readdirSync(__dirname + '/../../../pills/');
     console.log(files);
     $("ul#pillList").empty();
 
     for (var i in files) {
-        $("ul#pillList").append("<li><button class=\"btn-link\" type=\"button\">" + files[i] + "</button><button class=\"btn btn-danger btn-xs\" type=\"button\" onclick=\"removePill('" + files[i] + "')\">Remove</button></li>");
+        $("ul#pillList").append("<li><button class=\"btn-link\" type=\"button\" onclick=\"selectPill('" + files[i] + "')\">" + files[i] + "</button><button class=\"btn btn-danger btn-xs\" type=\"button\" onclick=\"removePill('" + files[i] + "')\">Remove</button></li>");
     }
 }
