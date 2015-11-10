@@ -1,4 +1,10 @@
 var fs = require('fs');
+
+$(document).ready(function() {
+    $("#calibrate").hide();
+    $("#analyze").hide();
+}); 
+
 deleteFolderRecursive = function(path) {
     var files = [];
     if( fs.existsSync(path) ) {
@@ -72,15 +78,49 @@ function selectPill(pill) {
                 $vexContent.data().vex.value = 'calibrate';
                 vex.close($vexContent.data().vex.id);
             }}),
-            $.extend({}, vex.dialog.buttons.NO, { text: 'Analyze', click: function($vexContent, event) {
+            $.extend({}, vex.dialog.buttons.NO, { className: 'vex-dialog-button-primary', text: 'Analyze', click: function($vexContent, event) {
                 $vexContent.data().vex.value = 'analyze';
                 vex.close($vexContent.data().vex.id);
-            }})
+            }}),
+                $.extend({}, vex.dialog.buttons.NO, { text: 'Back', click: function($vexContent, event) {
+                    $vexContent.data().vex.value = 'back';
+                    vex.close($vexContent.data().vex.id);
+                }})
         ],
         callback: function(value) {
-            console.log('Choice', value);
+            if (value != 'back') {
+                var pillDir = __dirname + '/../../../pills/' + pill;
+
+                if (value == 'analyze') {
+                    analyze(pill);
+                } else if (value == 'calibrate') {
+                    if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
+                        vex.dialog.alert('No scorch time detected');
+                    }
+
+                    calibrate(pill);
+                }
+            }
         }
     });
+}
+
+function calibrate(pill) {
+    $("#pillSelection").slideUp();
+    $("#analyze").slideUp();
+    $("#calibrate").slideDown();
+
+    var video = document.getElementById("videoElement");
+    video.play();
+}
+
+function analyze(pill) {
+    $("#pillSelection").slideUp();
+    $("#calibrate").slideUp();
+    $("#analyze").slideDown();
+
+    var video = document.getElementById("videoElement");
+    video.play();
 }
 
 function listPills() {
