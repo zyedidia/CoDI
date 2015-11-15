@@ -1,5 +1,6 @@
 var fs = require('fs');
 
+
 $(document).ready(function() {
     $("#calibrate").hide();
     $("#analyze").hide();
@@ -58,7 +59,6 @@ function newPill() {
 }
 
 function removePill(pill) {
-    console.log(pill);
     vex.dialog.confirm({
         message: 'Remove ' + pill + '?',
         callback: function(value) {
@@ -143,7 +143,6 @@ function analyze(pill) {
 
 function listPills() {
     var files = fs.readdirSync(__dirname + '/../../../pills/');
-    console.log(files);
     $("ul#pillList").empty();
 
     for (var i in files) {
@@ -170,5 +169,4 @@ function captureFrame(video, filename, scaleFactor) {
     var data = img.replace(/^data:image\/\w+;base64,/, "");
     var buf = new Buffer(data, 'base64');
     fs.writeFile(filename, buf);
-    console.log("saved");
 }
