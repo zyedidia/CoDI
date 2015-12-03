@@ -2,15 +2,15 @@
 <html>
     <head>
         <title>CoDI</title>
-        <script>window.$ = window.jQuery = require('../js/jquery-1.11.3.min.js');</script>
+        <script>window.$ = window.jQuery = require('../lib/jquery-1.11.3.min.js');</script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-        <script src="../js/vex.combined.min.js"></script>
+        <script src="../lib/vex.combined.min.js"></script>
         <link rel="stylesheet" href="../css/vex.css" />
         <link rel="stylesheet" href="../css/vex-theme-top.css" />
         <link rel="stylesheet" href="../css/theme.css"/>
         <script>vex.defaultOptions.className = 'vex-theme-top';</script>
-        <script src="../js/dragscroll.js"></script>
+        <script src="../lib/dragscroll.js"></script>
 
         <script src="../js/script.js"></script>
         <style>
@@ -19,11 +19,6 @@
                 width: 500px;
                 height: 375px;
                 border: 10px #333 solid;
-            }
-            #videoElement {
-                width: 400px;
-                height: 200px;
-                background-color: #666;
             }
         </style>
     </head>
@@ -47,28 +42,6 @@
                 <div id="analyze">
                     <h4>Analyzing</h4>
                 </div>
-            </div>
-            <div class="col-sm-8">
-                <h4>Camera</h4>
-                <video id="videoElement">
-                </video>
-                <script>
-                    var video = document.querySelector("#videoElement");
-
-                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
-
-                    if (navigator.getUserMedia) {       
-                        navigator.getUserMedia({video: true}, handleVideo, videoError);
-                    }
-
-                    function handleVideo(stream) {
-                        video.src = window.URL.createObjectURL(stream);
-                    }
-
-                    function videoError(e) {
-                        // do something
-                    }
-                </script>
             </div>
         </div>
     </body>
