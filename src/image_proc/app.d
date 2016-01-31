@@ -170,9 +170,24 @@ class Pill {
         }
     }
 
-    /* saveToFile(string filename) { */
-    /*     File =  */
-    /* } */
+    void saveToFile(string filename) {
+        File file = File(filename, "w");
+        file.writeln(this.totalPixelNum);
+        file.writeln(this.size);
+        file.writeln(this.dominantColor);
+        file.writeln(this.minR);
+        file.writeln(this.minB);
+        file.writeln(this.minG);
+        file.writeln(this.maxR);
+        file.writeln(this.maxB);
+        file.writeln(this.maxG);
+        file.writeln(this.avgR);
+        file.writeln(this.avgB);
+        file.writeln(this.avgG);
+        file.writeln(this.stdDevR);
+        file.writeln(this.stdDevB);
+        file.writeln(this.stdDevG);
+    }
 }
 
 bool calibrate(Pill pill) {
@@ -190,4 +205,5 @@ void main(in string[] args) {
     }
     IFImage img = read_image(args[1]);
     Pill pill = new Pill(img);
+    pill.saveToFile("test.txt");
 }
