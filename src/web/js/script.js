@@ -94,11 +94,17 @@ function selectPill(pill) {
                 if (value == 'analyze') {
                     analyze(pill);
                 } else if (value == 'calibrate') {
+                    var scorchTime = -1;
                     if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
-                        vex.dialog.alert('No scorch time detected');
+                        vex.dialog.prompt({
+                            message: 'Please input the scorch time (in seconds):',
+                            callback: function(value) {
+                                scorchTime = value;
+                            }
+                        });
                     }
 
-                    calibrate(pill, 5000);
+                    calibrate(pill, scorchTime * 1000);
                 }
             }
         }
@@ -130,10 +136,16 @@ function calibrate(pill, scorchTime) {
 
     camera.on("read", function( err, timestamp, filename ){
         console.log("timelapse image captured with filename: " + filename);
+        $("ul#calImgList").append("<li><img src=\"file://" + pillDir + "/calibrate/" + filename + "\" height=70 width=70/></li>");
     });
 
     camera.on("exit", function( timestamp ){
         console.log("timelapse child process has exited");
+
+        // Call the D code to analyze the pictures
+        // ...
+
+        vex.dialog.alert(pill + " has been calibrated. Here are the results:<br/>Blank<br/>Blank");
     });
 
     camera.on("stop", function( err, timestamp ){
@@ -157,10 +169,6 @@ function calibrate(pill, scorchTime) {
     //     clearTimeout(pictureTaker);
     // }, scorchTime + 3);
 
-    // Call the D code to analyze the pictures
-    // ...
-
-    vex.dialog.alert(pill + " has been calibrated. Here are the results:<br/>Blank<br/>Blank");
 }
 
 function analyze(pill) {

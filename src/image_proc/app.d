@@ -170,9 +170,9 @@ class Pill {
         }
     }
 
-    saveToFile(string filename) {
-        File = 
-    }
+    /* saveToFile(string filename) { */
+    /*     File =  */
+    /* } */
 }
 
 bool calibrate(Pill pill) {
