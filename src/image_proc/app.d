@@ -190,8 +190,14 @@ class Pill {
     }
 }
 
-bool calibrate(Pill pill) {
-    return false;
+bool calibrate(IFImage img, string pillname) {
+    Pill p = new Pill(img);
+    if(!exists("pills/" ~ pillname)) {
+        writeln(pillname, " doesn't exist");
+        return false;
+    }
+    p.saveToFile("pills/" ~ pillname ~ "/calibrate.txt");
+    return true;
 }
 
 bool analyze(Pill pill, Pill[] genuines) {
@@ -206,4 +212,5 @@ void main(in string[] args) {
     IFImage img = read_image(args[1]);
     Pill pill = new Pill(img);
     pill.saveToFile("test.txt");
+    calibrate(img, "test");
 }
