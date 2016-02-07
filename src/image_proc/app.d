@@ -5,8 +5,7 @@ import std.file;
 import std.string;
 import std.conv;
 
-class Pill {
-    string pillName;
+class PillImage {
     ulong totalPixelNum;
     int size;
     int dominantColor;
@@ -23,8 +22,7 @@ class Pill {
     double stdDevG;
     double stdDevB;
 
-    this(string name, IFImage img) {
-        this.pillName = name;
+    this(IFImage img) {
         ubyte r = 0; ubyte g = 0; ubyte b = 0;
 
         auto redPixels = 0; auto greenPixels = 0; auto bluePixels = 0;
@@ -145,15 +143,11 @@ class Pill {
         this.stdDevB = stddevB;
     }
 
-    this(string name, File txtFile) {
-        this.pillName = name;
-        string lines = [];
-        while (!txtFile.eof()) {
-            lines ~= chomp(txtFile.readln());
-        }
+    this(string src) {
+        string[] lines = src.split("\n");
 
         if (lines.length != 15) {
-            writeln("Invalid pill file ", txtFile.name);
+            writeln("Invalid");
         } else {
             this.totalPixelNum = to!ulong(lines[0]);
             this.size = to!int(lines[1]);
@@ -172,24 +166,54 @@ class Pill {
             this.stdDevG = to!double(lines[14]);
         }
     }
+}
+
+class Pill {
+    string pillName;
+    PillImage[] images;
+
+    this(string name, File txtFile) {
+        this.pillName = name;
+        string src = "";
+        while (!txtFile.eof()) {
+            src ~= txtFile.readln();
+        }
+
+        string[] imageSrcs = src.split("^\n$");
+        foreach (s; imageSrcs) {
+            images ~= new PillImage(s);
+        }
+    }
+
+    this(string name) {
+        this.pillName = name;
+        foreach (e; dirEntries("pills/" ~ name ~ "/calibrate", SpanMode.shallow)) {
+            if (e.name.endsWith(".jpg")) {
+                images ~= new PillImage(read_image(e.name));
+            }
+        }
+    }
 
     void saveToFile(string filename) {
         File file = File(filename, "w");
-        file.writeln(this.totalPixelNum);
-        file.writeln(this.size);
-        file.writeln(this.dominantColor);
-        file.writeln(this.minR);
-        file.writeln(this.minB);
-        file.writeln(this.minG);
-        file.writeln(this.maxR);
-        file.writeln(this.maxB);
-        file.writeln(this.maxG);
-        file.writeln(this.avgR);
-        file.writeln(this.avgB);
-        file.writeln(this.avgG);
-        file.writeln(this.stdDevR);
-        file.writeln(this.stdDevB);
-        file.writeln(this.stdDevG);
+        foreach (img; images) {
+            file.writeln(img.totalPixelNum);
+            file.writeln(img.size);
+            file.writeln(img.dominantColor);
+            file.writeln(img.minR);
+            file.writeln(img.minB);
+            file.writeln(img.minG);
+            file.writeln(img.maxR);
+            file.writeln(img.maxB);
+            file.writeln(img.maxG);
+            file.writeln(img.avgR);
+            file.writeln(img.avgB);
+            file.writeln(img.avgG);
+            file.writeln(img.stdDevR);
+            file.writeln(img.stdDevB);
+            file.writeln(img.stdDevG);
+            file.writeln();
+        }
     }
 
     bool calibrate() {
@@ -222,7 +246,7 @@ void main(in string[] args) {
         writeln("No input file");
         return;
     }
-    IFImage img = read_image(args[1]);
-    Pill pill = new Pill("test", img);
-    pill.calibrate();
+
+    Pill p = new Pill("test");
+    p.calibrate();
 }
