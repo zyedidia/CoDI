@@ -89,23 +89,29 @@ function selectPill(pill) {
                     vex.close($vexContent.data().vex.id);
                 }})
         ],
-        callback: function(value) {
-            if (value != 'back') {
+        callback: function(type) {
+            if (type != 'back') {
                 var pillDir = __dirname + '/../../../pills/' + pill;
                 var scorchTime = -1;
-                if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
+                if (!fs.existsSync(pillDir + '/scorchTime.txt')) {
                     vex.dialog.prompt({
                         message: 'Please input the scorch time (in seconds):',
                         callback: function(value) {
-                            scorchTime = value;
+                            scorchTime = parseInt(value);
+
+                            if (type == 'analyze') {
+                                analyze(pill, scorchTime);
+                            } else if (type == 'calibrate') {
+                                calibrate(pill, scorchTime * 1000);
+                            }
                         }
                     });
-                }
-
-                if (value == 'analyze') {
-                    analyze(pill, scorchTime);
-                } else if (value == 'calibrate') {
-                    calibrate(pill, scorchTime * 1000);
+                } else {
+                    if (type == 'analyze') {
+                        analyze(pill, scorchTime);
+                    } else if (type == 'calibrate') {
+                        calibrate(pill, scorchTime * 1000);
+                    }
                 }
             }
         }
@@ -113,10 +119,13 @@ function selectPill(pill) {
 }
 
 function takePictures(type, pill, scorchTime) {
+    var pillDir = __dirname + '/../../../pills/' + pill;
     var i = 0;
     if (!fs.existsSync(pillDir + '/' + type)) {
         fs.mkdirSync(pillDir + '/' + type);
     }
+
+    console.log("Taking pictures");
 
     var camera = new RaspiCam({
         mode: "timelapse",
