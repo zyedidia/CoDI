@@ -92,30 +92,19 @@ function selectPill(pill) {
         callback: function(value) {
             if (value != 'back') {
                 var pillDir = __dirname + '/../../../pills/' + pill;
+                var scorchTime = -1;
+                if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
+                    vex.dialog.prompt({
+                        message: 'Please input the scorch time (in seconds):',
+                        callback: function(value) {
+                            scorchTime = value;
+                        }
+                    });
+                }
 
                 if (value == 'analyze') {
-                    var scorchTime = -1;
-                    if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
-                        vex.dialog.prompt({
-                            message: 'Please input the scorch time (in seconds):',
-                            callback: function(value) {
-                                scorchTime = value;
-                            }
-                        });
-                    }
-
                     analyze(pill, scorchTime);
                 } else if (value == 'calibrate') {
-                    var scorchTime = -1;
-                    if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
-                        vex.dialog.prompt({
-                            message: 'Please input the scorch time (in seconds):',
-                            callback: function(value) {
-                                scorchTime = value;
-                            }
-                        });
-                    }
-
                     calibrate(pill, scorchTime * 1000);
                 }
             }
