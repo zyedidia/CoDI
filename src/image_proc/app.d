@@ -243,10 +243,14 @@ class Pill {
 
 void main(in string[] args) {
     if (args.length < 2) {
-        writeln("No input file");
+        writeln("Calibrate or analyze?");
         return;
     }
 
     Pill p = new Pill("test");
-    p.calibrate();
+    if (args[1] == "calibrate") {
+        p.calibrate();
+    } else if (args[1] == "analyze") {
+        p.analyze();
+    }
 }

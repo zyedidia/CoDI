@@ -1,5 +1,7 @@
 var fs = require('fs');
 var RaspiCam = require('../lib/raspicam');
+var sys = require('sys')
+var exec = require('child_process').exec;
 
 $(document).ready(function() {
     $("#calibrate").hide();
@@ -142,8 +144,8 @@ function calibrate(pill, scorchTime) {
     camera.on("exit", function( timestamp ){
         console.log("timelapse child process has exited");
 
-        // Call the D code to analyze the pictures
-        // ...
+        function puts(error, stdout, stderr) { sys.puts(stdout); }
+        exec("../../d_codi calibrate", puts);
 
         vex.dialog.alert(pill + " has been calibrated. Here are the results:<br/>Blank<br/>Blank");
     });
