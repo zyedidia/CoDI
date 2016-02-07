@@ -6,6 +6,7 @@ import std.string;
 import std.conv;
 
 class Pill {
+    string pillName;
     ulong totalPixelNum;
     int size;
     int dominantColor;
@@ -22,7 +23,8 @@ class Pill {
     double stdDevG;
     double stdDevB;
 
-    this(IFImage img) {
+    this(string name, IFImage img) {
+        this.pillName = name;
         ubyte r = 0; ubyte g = 0; ubyte b = 0;
 
         auto redPixels = 0; auto greenPixels = 0; auto bluePixels = 0;
@@ -143,7 +145,8 @@ class Pill {
         this.stdDevB = stddevB;
     }
 
-    this(File txtFile) {
+    this(string name, File txtFile) {
+        this.pillName = name;
         string lines = [];
         while (!txtFile.eof()) {
             lines ~= chomp(txtFile.readln());
@@ -188,20 +191,30 @@ class Pill {
         file.writeln(this.stdDevB);
         file.writeln(this.stdDevG);
     }
-}
 
-bool calibrate(IFImage img, string pillname) {
-    Pill p = new Pill(img);
-    if(!exists("pills/" ~ pillname)) {
-        writeln(pillname, " doesn't exist");
-        return false;
+    bool calibrate() {
+        if(!exists("pills/" ~ pillName)) {
+            writeln(pillName, " doesn't exist");
+            return false;
+        }
+        saveToFile("pills/" ~ pillName ~ "/calibrate.txt");
+        return true;
     }
-    p.saveToFile("pills/" ~ pillname ~ "/calibrate.txt");
-    return true;
-}
 
-bool analyze(Pill pill, Pill[] genuines) {
-    return false;
+    bool analyze() {
+        if (!exists("pills/" ~ pillName)) {
+            writeln(pillName, " doesn't exist");
+            return false;
+        }
+        if (!exists("pills/" ~ pillName ~ "/calibrate.txt")) {
+            writeln(pillName, " has not been calibrated yet!");
+            return false;
+        }
+
+        Pill genuine = new Pill(pillName, File("pills/" ~ pillName ~ "/calibrate.txt"));
+
+        return true;
+    }
 }
 
 void main(in string[] args) {
@@ -210,7 +223,6 @@ void main(in string[] args) {
         return;
     }
     IFImage img = read_image(args[1]);
-    Pill pill = new Pill(img);
-    pill.saveToFile("test.txt");
-    calibrate(img, "test");
+    Pill pill = new Pill("test", img);
+    pill.calibrate();
 }
