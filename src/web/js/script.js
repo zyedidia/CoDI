@@ -94,7 +94,17 @@ function selectPill(pill) {
                 var pillDir = __dirname + '/../../../pills/' + pill;
 
                 if (value == 'analyze') {
-                    analyze(pill);
+                    var scorchTime = -1;
+                    if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
+                        vex.dialog.prompt({
+                            message: 'Please input the scorch time (in seconds):',
+                            callback: function(value) {
+                                scorchTime = value;
+                            }
+                        });
+                    }
+
+                    analyze(pill, scorchTime);
                 } else if (value == 'calibrate') {
                     var scorchTime = -1;
                     if (!fs.existsSync(pillDir + 'scorchTime.txt')) {
@@ -113,20 +123,15 @@ function selectPill(pill) {
     });
 }
 
-function calibrate(pill, scorchTime) {
-    var pillDir = __dirname + '/../../../pills/' + pill;
-    $("#pillSelection").slideUp();
-    $("#analyze").slideUp();
-    $("#calibrate").slideDown();
-
+function takePictures(type, pill, scorchTime) {
     var i = 0;
-    if (!fs.existsSync(pillDir + '/calibrate')) {
-        fs.mkdirSync(pillDir + '/calibrate');
+    if (!fs.existsSync(pillDir + '/' + type)) {
+        fs.mkdirSync(pillDir + '/' + type);
     }
 
     var camera = new RaspiCam({
         mode: "timelapse",
-        output: pillDir + "/calibrate/image_%01d.jpg",
+        output: pillDir + "/" + type + "image_%01d.jpg",
         encoding: "jpg",
         timelapse: 1000, // take a picture every 1 seconds
         timeout: scorchTime
@@ -138,16 +143,16 @@ function calibrate(pill, scorchTime) {
 
     camera.on("read", function( err, timestamp, filename ){
         console.log("timelapse image captured with filename: " + filename);
-        $("ul#calImgList").append("<li><img src=\"file://" + pillDir + "/calibrate/" + filename + "\" height=70 width=70/></li>");
+        $("ul#calImgList").append("<li><img src=\"file://" + pillDir + "/" + type + "/" + filename + "\" height=70 width=70/></li>");
     });
 
     camera.on("exit", function( timestamp ){
         console.log("timelapse child process has exited");
 
         function puts(error, stdout, stderr) { sys.puts(stdout); }
-        exec("../../d_codi calibrate", puts);
+        exec("../../d_codi " + type, puts);
 
-        vex.dialog.alert(pill + " has been calibrated. Here are the results:<br/>Blank<br/>Blank");
+        vex.dialog.alert(pill + " has been " + type + "d. Here are the results:<br/>Blank<br/>Blank");
     });
 
     camera.on("stop", function( err, timestamp ){
@@ -155,29 +160,25 @@ function calibrate(pill, scorchTime) {
     });
 
     camera.start();
+}
 
-    // Take the pictures 
-    // ...
+function calibrate(pill, scorchTime) {
+    var pillDir = __dirname + '/../../../pills/' + pill;
+    $("#pillSelection").slideUp();
+    $("#analyze").slideUp();
+    $("#calibrate").slideDown();
 
-    // var pictureTaker = setInterval(function() {
-    //     captureFrame(video, pillDir + '/calibrate/image' + i + '.png', 1);
-    //     setTimeout(function() {
-    //         $("ul#calImgList").append("<li><img src=\"file://" + pillDir + "/calibrate/image" + i + ".png" + "\" height=70 width=70/></li>");
-    //         i++;
-    //     }, 2);
-    // }, 1000);
-    //
-    // setTimeout(function() {
-    //     clearTimeout(pictureTaker);
-    // }, scorchTime + 3);
+    takePictures("calibrate", pill, scorchTime);
 
 }
 
-function analyze(pill) {
+function analyze(pill, scorchTime) {
     var pillDir = __dirname + '/../../../pills/' + pill;
     $("#pillSelection").slideUp();
     $("#calibrate").slideUp();
     $("#analyze").slideDown();
+
+    takePictures("analyze", pill, scorchTime)
 }
 
 function listPills() {
