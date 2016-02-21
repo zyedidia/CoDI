@@ -236,6 +236,11 @@ class Pill {
         }
 
         Pill genuine = new Pill(pillName, File("pills/" ~ pillName ~ "/calibrate.txt"));
+        Pill test = new Pill(pillName);
+
+        foreach (i, image; genuine.images){
+            auto testImage = test.images[i];
+        }
 
         return true;
     }
