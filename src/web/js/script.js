@@ -167,7 +167,6 @@ function calibrate(pill, scorchTime) {
     $("#calibrate").slideDown();
 
     takePictures("calibrate", pill, scorchTime);
-
 }
 
 function analyze(pill, scorchTime) {

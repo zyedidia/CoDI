@@ -240,6 +240,26 @@ class Pill {
 
         foreach (i, image; genuine.images){
             auto testImage = test.images[i];
+
+            if (image.size != testImage.size) { writeln("size doesn't match in image ", i + 1); }
+
+            if (image.dominantColor != testImage.dominantColor) { writeln("dominantColor doesn't match in image ", i + 1); }
+
+            if (image.minR != testImage.minR) { writeln("minR doesn't match in image ", i + 1); }
+            if (image.minB != testImage.minB) { writeln("minB doesn't match in image ", i + 1); }
+            if (image.minG != testImage.minG) { writeln("minG doesn't match in image ", i + 1); }
+
+            if (image.maxR != testImage.maxR) { writeln("maxR doesn't match in image ", i + 1); }
+            if (image.maxB != testImage.maxB) { writeln("maxB doesn't match in image ", i + 1); }
+            if (image.maxG != testImage.maxG) { writeln("maxG doesn't match in image ", i + 1); }
+
+            if (image.avgR != testImage.avgR) { writeln("avgR doesn't match in image ", i + 1); }
+            if (image.avgB != testImage.avgB) { writeln("avgB doesn't match in image ", i + 1); }
+            if (image.avgG != testImage.avgG) { writeln("avgG doesn't match in image ", i + 1); }
+
+            if (image.stdDevR != testImage.stdDevR) { writeln("stdDevR doesn't match in image ", i + 1); }
+            if (image.stdDevB != testImage.stdDevB) { writeln("stdDevB doesn't match in image ", i + 1); }
+            if (image.stdDevG != testImage.stdDevG) { writeln("stdDevG doesn't match in image ", i + 1); }
         }
 
         return true;
