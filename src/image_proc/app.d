@@ -144,7 +144,7 @@ class PillImage {
     }
 
     this(string src) {
-        string[] lines = src.split("\n");
+        string[] lines = strip(src).split("\n");
 
         if (lines.length != 15) {
             writeln("Invalid");
@@ -185,9 +185,9 @@ class Pill {
         }
     }
 
-    this(string name) {
+    this(string name, string type) {
         this.pillName = name;
-        foreach (e; dirEntries("pills/" ~ name ~ "/calibrate", SpanMode.shallow)) {
+        foreach (e; dirEntries("pills/" ~ name ~ "/" ~ type, SpanMode.shallow)) {
             if (e.name.endsWith(".jpg")) {
                 images ~= new PillImage(read_image(e.name));
             }
@@ -236,7 +236,7 @@ class Pill {
         }
 
         Pill genuine = new Pill(pillName, File("pills/" ~ pillName ~ "/calibrate.txt"));
-        Pill test = new Pill(pillName);
+        Pill test = new Pill(pillName, "analyze");
 
         foreach (i, image; genuine.images){
             auto testImage = test.images[i];
@@ -245,25 +245,49 @@ class Pill {
 
             if (image.dominantColor != testImage.dominantColor) { writeln("dominantColor doesn't match in image ", i + 1); }
 
-            if (image.minR != testImage.minR) { writeln("minR doesn't match in image ", i + 1); }
-            if (image.minB != testImage.minB) { writeln("minB doesn't match in image ", i + 1); }
-            if (image.minG != testImage.minG) { writeln("minG doesn't match in image ", i + 1); }
-
-            if (image.maxR != testImage.maxR) { writeln("maxR doesn't match in image ", i + 1); }
-            if (image.maxB != testImage.maxB) { writeln("maxB doesn't match in image ", i + 1); }
-            if (image.maxG != testImage.maxG) { writeln("maxG doesn't match in image ", i + 1); }
-
-            if (image.avgR != testImage.avgR) { writeln("avgR doesn't match in image ", i + 1); }
-            if (image.avgB != testImage.avgB) { writeln("avgB doesn't match in image ", i + 1); }
-            if (image.avgG != testImage.avgG) { writeln("avgG doesn't match in image ", i + 1); }
-
-            if (image.stdDevR != testImage.stdDevR) { writeln("stdDevR doesn't match in image ", i + 1); }
-            if (image.stdDevB != testImage.stdDevB) { writeln("stdDevB doesn't match in image ", i + 1); }
-            if (image.stdDevG != testImage.stdDevG) { writeln("stdDevG doesn't match in image ", i + 1); }
+            if (abs((image.avgR + image.stdDevR) - (testImage.avgR + testImage.stdDevR)) > 1) { 
+                writeln("Red does not match in image ", i + 1);
+                writeln(abs((image.avgR + image.stdDevR) - testImage.avgR + testImage.stdDevR));
+                writeln(image.avgR);
+                writeln(testImage.avgR);
+                return false;
+            }
+            if (abs((image.avgG + image.stdDevG) - (testImage.avgG + testImage.stdDevG)) > 1) { 
+                writeln("Green does not match", i + 1);
+                return false;
+            }
+            if (abs((image.avgB + image.stdDevB) - (testImage.avgB + testImage.stdDevB)) > 1) { 
+                writeln("Blue does not match", i + 1);
+                return false;
+            }
         }
 
         return true;
     }
+}
+
+bool analyze(PillImage genuine, PillImage test) {
+    if (genuine.size != test.size) { writeln("size doesn't match in genuine "); }
+
+    if (genuine.dominantColor != test.dominantColor) { writeln("dominantColor doesn't match in image "); }
+
+    if (genuine.avgR - genuine.stdDevR > test.avgR || (genuine.avgR + genuine.stdDevR) < test.avgR) { 
+        writeln("Red does not match");
+        writeln(genuine.avgR, " ", genuine.stdDevR, " ", test.avgR);
+        return false;
+    }
+    if (genuine.avgG - genuine.stdDevG > test.avgG || genuine.avgG + genuine.stdDevG < test.avgG) { 
+        writeln("Green does not match");
+        writeln(genuine.avgG, " ", genuine.stdDevG, " ", test.avgG);
+        return false;
+    }
+    if (genuine.avgB - genuine.stdDevB > test.avgB || genuine.avgB + genuine.stdDevB < test.avgB) { 
+        writeln("Blue does not match");
+        writeln(genuine.avgB, " ", genuine.stdDevB, " ", test.avgB);
+        return false;
+    }
+
+    return true;
 }
 
 void main(in string[] args) {
@@ -272,10 +296,15 @@ void main(in string[] args) {
         return;
     }
 
-    Pill p = new Pill("test");
-    if (args[1] == "calibrate") {
-        p.calibrate();
-    } else if (args[1] == "analyze") {
-        p.analyze();
-    }
+    PillImage genuine = new PillImage(read_image(args[2]));
+    PillImage test = new PillImage(read_image(args[3]));
+
+    writeln(analyze(genuine, test));
+
+    // Pill p = new Pill("test", "calibrate");
+    // if (args[1] == "calibrate") {
+    //     p.calibrate();
+    // } else if (args[1] == "analyze") {
+    //     p.analyze();
+    // }
 }
