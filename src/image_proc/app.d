@@ -124,7 +124,6 @@ class PillImage {
         }
 
         int size = dominantColor == 0 ? redPixels : dominantColor == 1 ? greenPixels : bluePixels;
-        /* write_image("out.png", img.w, img.h, img.pixels); */
 
         this.totalPixelNum = img.pixels.length;
         this.size = size;
@@ -143,10 +142,30 @@ class PillImage {
         this.stdDevB = stddevB;
     }
 
+    void saveToFile(string filename) {
+        File file = File(filename, "w");
+        file.writeln(this.totalPixelNum);
+        file.writeln(this.size);
+        file.writeln(this.dominantColor);
+        file.writeln(this.minR);
+        file.writeln(this.minB);
+        file.writeln(this.minG);
+        file.writeln(this.maxR);
+        file.writeln(this.maxB);
+        file.writeln(this.maxG);
+        file.writeln(this.avgR);
+        file.writeln(this.avgB);
+        file.writeln(this.avgG);
+        file.writeln(this.stdDevR);
+        file.writeln(this.stdDevB);
+        file.writeln(this.stdDevG);
+        file.writeln();
+    }
+
     this(string src) {
         string[] lines = strip(src).split("\n");
 
-        if (lines.length != 15) {
+        if (lines.length < 15) {
             writeln("Invalid");
         } else {
             this.totalPixelNum = to!ulong(lines[0]);
@@ -165,104 +184,6 @@ class PillImage {
             this.stdDevB = to!double(lines[13]);
             this.stdDevG = to!double(lines[14]);
         }
-    }
-}
-
-class Pill {
-    string pillName;
-    PillImage[] images;
-
-    this(string name, File txtFile) {
-        this.pillName = name;
-        string src = "";
-        while (!txtFile.eof()) {
-            src ~= txtFile.readln();
-        }
-
-        string[] imageSrcs = src.split("^\n$");
-        foreach (s; imageSrcs) {
-            images ~= new PillImage(s);
-        }
-    }
-
-    this(string name, string type) {
-        this.pillName = name;
-        foreach (e; dirEntries("pills/" ~ name ~ "/" ~ type, SpanMode.shallow)) {
-            if (e.name.endsWith(".jpg")) {
-                images ~= new PillImage(read_image(e.name));
-            }
-        }
-    }
-
-    void saveToFile(string filename) {
-        File file = File(filename, "w");
-        foreach (img; images) {
-            file.writeln(img.totalPixelNum);
-            file.writeln(img.size);
-            file.writeln(img.dominantColor);
-            file.writeln(img.minR);
-            file.writeln(img.minB);
-            file.writeln(img.minG);
-            file.writeln(img.maxR);
-            file.writeln(img.maxB);
-            file.writeln(img.maxG);
-            file.writeln(img.avgR);
-            file.writeln(img.avgB);
-            file.writeln(img.avgG);
-            file.writeln(img.stdDevR);
-            file.writeln(img.stdDevB);
-            file.writeln(img.stdDevG);
-            file.writeln();
-        }
-    }
-
-    bool calibrate() {
-        if(!exists("pills/" ~ pillName)) {
-            writeln(pillName, " doesn't exist");
-            return false;
-        }
-        saveToFile("pills/" ~ pillName ~ "/calibrate.txt");
-        return true;
-    }
-
-    bool analyze() {
-        if (!exists("pills/" ~ pillName)) {
-            writeln(pillName, " doesn't exist");
-            return false;
-        }
-        if (!exists("pills/" ~ pillName ~ "/calibrate.txt")) {
-            writeln(pillName, " has not been calibrated yet!");
-            return false;
-        }
-
-        Pill genuine = new Pill(pillName, File("pills/" ~ pillName ~ "/calibrate.txt"));
-        Pill test = new Pill(pillName, "analyze");
-
-        foreach (i, image; genuine.images){
-            auto testImage = test.images[i];
-
-            if (image.size != testImage.size) { writeln("size doesn't match in image ", i + 1); }
-
-            if (image.dominantColor != testImage.dominantColor) { writeln("dominantColor doesn't match in image ", i + 1); }
-
-            if (abs((image.avgR + image.stdDevR) - (testImage.avgR + testImage.stdDevR)) > 1) { 
-                writeln("Red does not match in image ", i + 1);
-                writeln(abs((image.avgR + image.stdDevR) - testImage.avgR + testImage.stdDevR));
-                writeln(image.avgR);
-                writeln(testImage.avgR);
-                return false;
-            }
-            if (abs((image.avgG + image.stdDevG) - (testImage.avgG + testImage.stdDevG)) > 1) { 
-                writeln("Green does not match", i + 1);
-                return false;
-            }
-            if (abs((image.avgB + image.stdDevB) - (testImage.avgB + testImage.stdDevB)) > 1) { 
-                writeln("Blue does not match", i + 1);
-                return false;
-            }
-        }
-
-        return true;
     }
 }
 
@@ -296,15 +217,13 @@ void main(in string[] args) {
         return;
     }
 
-    PillImage genuine = new PillImage(read_image(args[2]));
-    PillImage test = new PillImage(read_image(args[3]));
+    if (args[1] == "analyze") {
+        PillImage genuine = new PillImage(read_image(args[2]));
+        PillImage test = new PillImage(read_image(args[3]));
 
-    writeln(analyze(genuine, test));
-
-    // Pill p = new Pill("test", "calibrate");
-    // if (args[1] == "calibrate") {
-    //     p.calibrate();
-    // } else if (args[1] == "analyze") {
-    //     p.analyze();
-    // }
+        writeln(analyze(genuine, test));
+    } else if (args[1] == "calibrate") {
+        PillImage genuine = new PillImage(read_image(args[2]));
+        genuine.saveToFile(args[2] ~ ".txt");
+    }
 }
