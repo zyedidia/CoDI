@@ -43,19 +43,33 @@ function newPill() {
                 vex.dialog.alert(data.pillname + " is not a valid name. Please use only alphanumeric characters and no spaces.");
                 return;
             }
+            var pillName = data.pillname;
 
-            var pillDir = __dirname + '/../../../pills/';
-            if (!fs.existsSync(pillDir)) {
-                fs.mkdirSync(pillDir);
-            }
-            var dir = pillDir + data.pillname.toLowerCase();
+            vex.dialog.prompt({
+                message: 'Please input the scorch time for this pill (in seconds):',
+                callback: function(value) {
+                    if (isNaN(value)) {
+                        // Not a valid number
+                        vex.dialog.alert(value + " is not a valid number.");
+                        return;
+                    }
+                    scorchTime = parseInt(value);
 
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
-                listPills();
-            } else {
-                vex.dialog.alert(data.pillname + " is already a registered pill.");
-            }
+                    pillName += scorchTime;
+                    var pillDir = __dirname + '/../../../pills/';
+                    if (!fs.existsSync(pillDir)) {
+                        fs.mkdirSync(pillDir);
+                    }
+                    var dir = pillDir + pillName.toLowerCase();
+
+                    if (!fs.existsSync(dir)) {
+                        fs.mkdirSync(dir);
+                        listPills();
+                    } else {
+                        vex.dialog.alert(pillName + " is already a registered pill.");
+                    }
+                }
+            });
         }
     });
 }
@@ -93,25 +107,16 @@ function selectPill(pill) {
             if (type != 'back') {
                 var pillDir = __dirname + '/../../../pills/' + pill;
                 var scorchTime = -1;
-                if (!fs.existsSync(pillDir + '/scorchTime.txt')) {
-                    vex.dialog.prompt({
-                        message: 'Please input the scorch time (in seconds):',
-                        callback: function(value) {
-                            scorchTime = parseInt(value);
+                var matches = pill.match(/\d+$/);
+                if (matches) {
+                    number = matches[0];
+                    scorchTime = parseInt(number, 10);
+                }
 
-                            if (type == 'analyze') {
-                                analyze(pill, scorchTime);
-                            } else if (type == 'calibrate') {
-                                calibrate(pill, scorchTime * 1000);
-                            }
-                        }
-                    });
-                } else {
-                    if (type == 'analyze') {
-                        analyze(pill, scorchTime);
-                    } else if (type == 'calibrate') {
-                        calibrate(pill, scorchTime * 1000);
-                    }
+                if (type == 'analyze') {
+                    analyze(pill, scorchTime);
+                } else if (type == 'calibrate') {
+                    calibrate(pill, scorchTime * 1000);
                 }
             }
         }
